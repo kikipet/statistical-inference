@@ -1,0 +1,54 @@
+---
+title: Part 2 <!-- Give an appropriate title -->
+author: Song Kim
+---
+
+<!-- Load the ToothGrowth data and perform some basic exploratory data analyses
+Provide a basic summary of the data.
+Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
+State your conclusions and the assumptions needed for your conclusions. -->
+
+<!-- The response is the length of odontoblasts (cells responsible for tooth growth) in 60 guinea pigs. Each animal received one of three dose levels of vitamin C (0.5, 1, and 2 mg/day) by one of two delivery methods, orange juice or ascorbic acid (a form of vitamin C and coded as VC).
+
+A data frame with 60 observations on 3 variables.
+    len 	numeric 	Tooth length
+    supp 	factor 	Supplement type (VC or OJ). -->
+
+<!-- VC = ascorbic acid; OJ = orange juice -->
+
+```{r setup, echo=FALSE}
+library(datasets)
+library(ggplot2)
+```
+
+```{r summary}
+str(subset(ToothGrowth, supp=="OJ")[,1])
+summary(subset(ToothGrowth, supp=="VC")[,1])
+```
+There are 30 samples each treated with orange juice and ascorbic acid. For each treatment, 10 samples are at 0.5mg dose, 10 are at 1mg dose, and 10 are at 2mg dose.
+
+```{r hist}
+qplot(len, data=ToothGrowth, bins=10, facets=~supp)
+qplot(len, data=ToothGrowth, bins=10, facets=~dose)
+```
+
+```{r int}
+conf = function(dat, percent) {
+    m <- mean(dat)
+    sd <- sqrt(var(dat))
+    e <- qt(1-(1-percent)/2, df=length(dat)-1)*sd/sqrt(length(dat))
+    c(m-e, m+e)
+}
+
+conf(subset(ToothGrowth, supp=="VC")$len, 0.95)
+conf(subset(ToothGrowth, supp=="OJ")$len, 0.95)
+
+# idk what I'm doing
+t.test(subset(ToothGrowth, supp=="VC")$len, subset(ToothGrowth, supp=="OJ")$len)
+# is VC vs. OJ not significant?
+
+t.test(subset(ToothGrowth, dose==0.5)$len, subset(ToothGrowth, dose==1)$len)
+t.test(subset(ToothGrowth, dose==2)$len, subset(ToothGrowth, dose==1)$len)
+t.test(subset(ToothGrowth, dose==0.5)$len, subset(ToothGrowth, dose==2)$len)
+
+```
